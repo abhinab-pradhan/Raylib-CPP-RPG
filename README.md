@@ -26,3 +26,35 @@ This project is still under active development.
   Art Style: 2D Pixel Art
 
   Platform: Windows 
+
+🧠 Current Progress
+
+This is an early-stage project. The focus right now is on:
+
+Core player movement
+
+Map rendering
+
+Basic material collection system
+
+Future updates will include enemies, dungeons, combat mechanics, and crafting.
+
+🤝 Contributing
+
+Contributions, ideas, and feedback are welcome!
+If you’d like to suggest something, feel free to open an issue or submit a pull request.🧠 Current Progress
+
+This is an early-stage project. The focus right now is on:
+
+Core player movement
+
+Map rendering
+
+Basic material collection system
+
+Future updates will include enemies, dungeons, combat mechanics, and crafting.
+
+🤝 Contributing
+
+Contributions, ideas, and feedback are welcome!
+If you’d like to suggest something, feel free to open an issue or submit a pull request.
