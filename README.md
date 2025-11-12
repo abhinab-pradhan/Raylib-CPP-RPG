@@ -5,24 +5,24 @@ This project is still under active development.
 
 🎮 Features (Planned & In Progress)
 
-✅ Basic player movement
+  ✅ Basic player movement
 
-✅ Tile-based world and collision
+  ✅ Tile-based world and collision
 
-⚒️ Material collection system (in progress)
+  ⚒️ Material collection system (in progress)
 
-⚔️ Dungeon exploration & combat system (upcoming)
+  ⚔️ Dungeon exploration & combat system (upcoming)
 
-💾 Simple inventory system (upcoming)
+  💾 Simple inventory system (upcoming)
 
-🎨 Retro pixel art style
+  🎨 Retro pixel art style
 
 🧩 Tech Stack
 
-Language: C++
+  Language: C++
 
-Graphics Library: Raylib
+  Graphics Library: Raylib
 
-Art Style: 2D Pixel Art
+  Art Style: 2D Pixel Art
 
-Platform: Windows 
+  Platform: Windows 
