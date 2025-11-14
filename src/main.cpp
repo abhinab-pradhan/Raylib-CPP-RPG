@@ -8,22 +8,45 @@
 const int screenWidth=800;
 const int screenHeight=600;
 
+typedef enum{
+    TILE_TYPE_DIRT=0,
+    TILE_TYPE_GRASS,
+    TILE_TYPE_TREE,
+    TILE_TYPE_STONE,
+}tile_type;
+
 typedef struct{
     int x;
     int y;
+    int type;
 }sTile;
+
+typedef enum{
+    ZONE_ALL=0,
+    ZONE_WORLD,
+    ZONE_DUNGEON
+} eZone;
 
 typedef struct 
 {
     int x;
     int y;
+    eZone zone;
 } sEntity;
+
 sEntity player;
+sEntity dungeon_gate;
+sEntity orc;
+
 sTile world[WORLD_WIDTH][WORLD_HEIGHT];
+sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
+
 Camera2D camera={0};
+
 typedef enum{
     TEXTURE_TILEMAP=0
 } texture_asset;
+
 Texture2D textures[MAX_TEXTURES];
 
 
@@ -46,13 +69,35 @@ void GameStartup(){
             world[i][j]=(sTile){
                 .x=i,
                 .y=j,
+                .type=GetRandomValue(TILE_TYPE_DIRT,TILE_TYPE_TREE)
+            };
+
+            dungeon[i][j]=(sTile){
+                .x=i,
+                .y=j,
+                .type=TILE_TYPE_DIRT
             };
         }
     }
 
+    //starting position of player
     player=(sEntity){
         .x=TILE_WIDTH*3,
-        .y=TILE_HEIGHT*3
+        .y=TILE_HEIGHT*3,
+        .zone=ZONE_WORLD
+    };
+
+    //position of dungeon gate
+    dungeon_gate=(sEntity){  
+        .x=TILE_WIDTH*10,
+        .y=TILE_HEIGHT*10,
+        .zone=ZONE_ALL
+    };
+
+    orc=(sEntity){
+        .x=TILE_WIDTH *5,
+        .y=TILE_HEIGHT *5,
+        .zone=ZONE_DUNGEON
     };
 
     camera.target=(Vector2){player.x,player.y};
@@ -66,19 +111,22 @@ void GameStartup(){
 void GameUpdate(){
     float x=player.x;
     float y=player.y;
-    if(IsKeyPressed(KEY_LEFT)){
+
+    //player move control
+    if(IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)){
         x-=1*TILE_WIDTH;
     }
-    else if(IsKeyPressed(KEY_RIGHT)){
+    else if(IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)){
         x+=1*TILE_WIDTH;
     }
-    else if (IsKeyPressed(KEY_UP)){
+    else if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)){
         y-=1*TILE_HEIGHT;
     }
-    else if(IsKeyPressed(KEY_DOWN)){
+    else if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)){
         y+=1*TILE_HEIGHT;
     }
     
+    //for world zoom
     float wheel=GetMouseWheelMove();
     if(wheel!=0){
         const float zoomIncrement=0.125f;
@@ -90,6 +138,18 @@ void GameUpdate(){
     player.x=x;
     player.y=y;
     camera.target=(Vector2){player.x,player.y};
+
+    if(IsKeyPressed(KEY_E)){
+        if(player.x==dungeon_gate.x && player.y==dungeon_gate.y){
+            //enter dungeon
+            if(player.zone==ZONE_WORLD){
+                player.zone=ZONE_DUNGEON;
+            }
+            else if(player.zone==ZONE_DUNGEON){
+                player.zone=ZONE_WORLD;
+            }
+        }
+    }
 }
 
 
@@ -100,13 +160,48 @@ void GameRender(){
     int texture_index_y=0;
     for(int i=0;i<WORLD_WIDTH;i++){
         for(int j=0;j<WORLD_HEIGHT;j++){
-            tile=world[i][j];
-            texture_index_x=4;
-            texture_index_y=4;
+            if(player.zone==ZONE_WORLD){
+                tile=world[i][j];
+            }
+            else if(player.zone==ZONE_DUNGEON){
+                tile=dungeon[i][j];
+            }
+
+            switch (tile.type)
+            {
+            case TILE_TYPE_DIRT:
+                texture_index_x=4;
+                texture_index_y=4;
+                break;
+            case TILE_TYPE_GRASS:
+                texture_index_x=5;
+                texture_index_y=4;
+                break;
+            case TILE_TYPE_TREE:
+                texture_index_x=5;
+                texture_index_y=5;
+                break;
+            case TILE_TYPE_STONE:
+                texture_index_x=1;
+                texture_index_y=6;
+                break;
+
+            }
+
             DrawTile(tile.x*TILE_WIDTH,tile.y*TILE_HEIGHT,texture_index_x,texture_index_y);
         }
     }
 
+    //render dungeon gate
+    //draw gate
+    DrawTile(dungeon_gate.x,dungeon_gate.y,8,9);
+
+    //draw orc
+    if(orc.zone==player.zone){
+        DrawTile(orc.x,orc.y,11,0);
+    }
+
+    //render player
     DrawTile(camera.target.x,camera.target.y,4,0);
     EndMode2D();
 
