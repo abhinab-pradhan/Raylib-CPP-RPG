@@ -32,6 +32,10 @@ typedef struct
     int x;
     int y;
     eZone zone;
+    bool isPassable;
+    bool isAlive;
+    int health;
+    int damage;
 } sEntity;
 
 sEntity player;
@@ -84,20 +88,29 @@ void GameStartup(){
     player=(sEntity){
         .x=TILE_WIDTH*3,
         .y=TILE_HEIGHT*3,
-        .zone=ZONE_WORLD
+        .zone=ZONE_WORLD,
+        .isPassable=false,
+        .isAlive=true,
+        .health=100,
+        .damage=0
     };
 
     //position of dungeon gate
     dungeon_gate=(sEntity){  
         .x=TILE_WIDTH*10,
         .y=TILE_HEIGHT*10,
-        .zone=ZONE_ALL
+        .zone=ZONE_ALL,
+        .isPassable=true,
     };
 
     orc=(sEntity){
         .x=TILE_WIDTH *5,
         .y=TILE_HEIGHT *5,
-        .zone=ZONE_DUNGEON
+        .zone=ZONE_DUNGEON,
+        .isPassable=false,
+        .isAlive=true,
+        .health=100,
+        .damage=0
     };
 
     camera.target=(Vector2){player.x,player.y};
@@ -135,9 +148,22 @@ void GameUpdate(){
         if(camera.zoom >8.0f) camera.zoom=8.0f;
     }
 
-    player.x=x;
-    player.y=y;
-    camera.target=(Vector2){player.x,player.y};
+    //orc collisions
+    if(player.zone==orc.zone && orc.x==x && orc.y==y){
+        int damage=GetRandomValue(2,20);
+        orc.health-=damage;
+        orc.damage=damage; //store damage
+
+        if(orc.health<=0){
+            orc.isAlive=false;
+        }
+    }
+    else{
+        player.x=x;
+        player.y=y;
+        camera.target=(Vector2){player.x,player.y};
+    }
+
 
     if(IsKeyPressed(KEY_E)){
         if(player.x==dungeon_gate.x && player.y==dungeon_gate.y){
@@ -198,7 +224,7 @@ void GameRender(){
 
     //draw orc
     if(orc.zone==player.zone){
-        DrawTile(orc.x,orc.y,11,0);
+        if(orc.isAlive) DrawTile(orc.x,orc.y,11,0);
     }
 
     //render player
@@ -210,6 +236,8 @@ void GameRender(){
 
     DrawText(TextFormat("Camera target: (%06.2f,%06.2f)",camera.target.x,camera.target.y),15,10,14,YELLOW);
     DrawText(TextFormat("Camera Zoom: %06.2f",camera.zoom),15,30,14,YELLOW);
+    DrawText(TextFormat("Health: %d",player.health),15,50,14,YELLOW);
+    if(orc.isAlive) DrawText(TextFormat("Orc Health: %d",orc.health),15,110,14,YELLOW);
 }
 
 
